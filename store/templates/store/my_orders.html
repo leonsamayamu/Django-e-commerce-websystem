@@ -1,0 +1,37 @@
+{% extends "store/base.html" %}
+<<<<<<< HEAD
+{% block title %}My orders - {{ shop_name }}{% endblock %}
+{% block layout_class %}with-sidebar{% endblock %}
+{% block sidebar %}{% include "partials/sidebar_account.html" %}{% endblock %}
+{% block content %}
+<h1 class="mb-6">My orders</h1>
+<div class="space-y-4">
+{% for o in orders %}
+<div class="card">
+  <div class="flex flex-wrap items-center gap-2">
+    <a class="font-semibold" href="{{ o.get_absolute_url }}">Order #{{ o.pk }}</a><span class="text-sm text-slate-500">{{ o.created|date:"j M Y H:i" }}</span>
+    <span class="badge badge-{{ o.status }}">{{ o.get_status_display }}</span>{% if o.paid %}<span class="badge badge-ok">Paid</span>{% else %}<span class="badge badge-pending">Unpaid</span>{% endif %}
+  </div>
+  <ul class="mt-3 divide-y divide-slate-100 text-sm">
+    {% for i in o.items.all %}<li class="flex justify-between py-1.5"><span>{{ i.quantity }} &times; {{ i.display_name }}</span><span>{{ currency }} {{ i.line_total }}</span></li>{% endfor %}
+  </ul>
+  <div class="mt-3 flex flex-wrap items-center justify-between gap-2"><span class="flex gap-2"><a class="btn btn-outline btn-sm" href="{{ o.get_absolute_url }}">View / track</a><a class="btn btn-outline btn-sm" href="{% url 'invoice_pdf' o.token %}">Invoice PDF</a></span><span class="text-lg font-bold">Total: {{ currency }} {{ o.total }}</span></div>
+</div>
+{% empty %}<p class="rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-500">No orders yet. <a href="{% url 'product_list' %}">Start shopping</a></p>{% endfor %}
+</div>
+=======
+{% block title %}My orders{% endblock %}
+{% block content %}
+<h1>My orders</h1>
+{% for o in orders %}
+<div class="card" style="margin-bottom:1rem">
+  <p><strong>Order #{{ o.pk }}</strong> &middot; {{ o.created|date:"j M Y H:i" }} &middot;
+     <span class="badge {{ o.status }}">{{ o.get_status_display }}</span>
+     {% if o.paid %}<span class="badge delivered">Paid</span>{% endif %}</p>
+  {% for i in o.items.all %}<p>{{ i.quantity }} &times; {{ i.product.name }} <span class="right">{{ currency }} {{ i.line_total }}</span></p>{% endfor %}
+  <p class="total">Total: {{ currency }} {{ o.total }}</p>
+</div>
+{% empty %}<p>No orders yet. <a href="{% url 'product_list' %}">Start shopping</a></p>
+{% endfor %}
+>>>>>>> e3ba4c2ef93cb02a22c05fe11cdcdada809f318b
+{% endblock %}

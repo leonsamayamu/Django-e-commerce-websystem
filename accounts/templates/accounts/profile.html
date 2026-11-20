@@ -1,0 +1,40 @@
+{% extends "store/base.html" %}
+{% block title %}My profile - {{ shop_name }}{% endblock %}
+{% block layout_class %}with-sidebar{% endblock %}
+{% block sidebar %}{% include "partials/sidebar_account.html" %}{% endblock %}
+{% block content %}
+<h1 class="mb-6">My profile</h1>
+<form method="post" enctype="multipart/form-data" class="card max-w-2xl">
+  {% csrf_token %}
+  <div class="mb-6 flex items-center gap-5">
+    {% if prof.avatar %}<img class="h-20 w-20 rounded-full object-cover" src="{{ prof.avatar.url }}" alt="Your photo">{% else %}<span class="grid h-20 w-20 flex-none place-items-center rounded-full bg-teal-700 text-3xl font-bold text-white" aria-hidden="true">{{ user.username|first|upper }}</span>{% endif %}
+    <div class="min-w-0 flex-1">
+      <label for="{{ pform.avatar.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">Profile photo</label>
+      {{ pform.avatar }}{{ pform.avatar.errors }}
+      {% if prof.avatar %}<label class="mt-2 inline-flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" name="remove_avatar"> Remove photo</label>{% endif %}
+      <p class="mt-1 text-xs text-slate-500">JPG, PNG or WebP, up to 5 MB.</p>
+    </div>
+  </div>
+  <div class="mb-4"><label class="mb-1 block text-sm font-medium text-slate-700">Username</label><input value="{{ user.username }}" disabled class="!bg-slate-100"></div>
+  <div class="grid gap-x-4 sm:grid-cols-2">
+    {% include "partials/field.html" with field=uform.first_name %}
+    {% include "partials/field.html" with field=uform.last_name %}
+    <div class="sm:col-span-2">{% include "partials/field.html" with field=uform.email %}</div>
+    {% include "partials/field.html" with field=pform.phone %}
+    {% include "partials/field.html" with field=pform.city %}
+    <div class="sm:col-span-2">{% include "partials/field.html" with field=pform.address %}</div>
+  </div>
+  <button class="btn" type="submit">Save changes</button>
+</form>
+
+<section class="card mt-6 max-w-2xl" aria-labelledby="news-title">
+  <h2 id="news-title" class="text-lg">Newsletter</h2>
+  {% if newsletter_subscribed %}
+  <p class="mt-2 flex items-center gap-2 text-sm text-emerald-700"><span class="badge badge-ok">Subscribed</span> {{ user.email }}</p>
+  <form method="post" action="{% url 'newsletter_toggle' %}" class="mt-3">{% csrf_token %}<input type="hidden" name="action" value="unsubscribe"><button class="btn btn-outline btn-sm" type="submit">Unsubscribe</button></form>
+  {% else %}
+  <p class="mt-2 text-sm text-slate-600"><span class="badge">Not subscribed</span> Get offers and news at {{ user.email|default:"your email (add one above)" }}.</p>
+  {% if user.email %}<form method="post" action="{% url 'newsletter_toggle' %}" class="mt-3">{% csrf_token %}<button class="btn btn-sm" type="submit">Subscribe</button></form>{% endif %}
+  {% endif %}
+</section>
+{% endblock %}

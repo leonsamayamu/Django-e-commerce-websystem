@@ -1,0 +1,39 @@
+{% extends "store/base.html" %}
+{% block title %}{{ page.headline }} - {{ shop_name }}{% endblock %}
+{% block meta_description %}{{ page.intro|truncatechars:150 }}{% endblock %}
+{% block layout_class %}with-sidebar{% endblock %}
+{% block sidebar %}{% include "partials/sidebar_shop.html" %}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-start justify-between gap-3">
+  <h1>{{ page.headline }}</h1>
+  {% if "content" in caps %}<a class="btn btn-outline btn-sm" href="{% url 'staff_about' %}">Edit this page</a>{% endif %}
+</div>
+<p class="mt-3 max-w-2xl whitespace-pre-line text-lg text-slate-600">{{ page.intro }}</p>
+
+{% if photos %}
+<div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+  <img class="max-h-96 w-full object-cover" src="{{ photos.0.image.url }}" alt="{{ photos.0.caption|default:'About us' }}">
+  {% if photos.0.caption %}<p class="px-4 py-2 text-sm text-slate-500">{{ photos.0.caption }}</p>{% endif %}
+</div>
+{% endif %}
+
+<div class="my-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+  {% for s in sections %}<section class="card"><h2 class="text-lg">{{ s.heading }}</h2><div class="mt-2 space-y-3 text-sm text-slate-600">{{ s.body|linebreaks }}</div></section>
+  {% empty %}<p class="text-slate-500">Nothing here yet.</p>{% endfor %}
+</div>
+
+{% if photos|length > 1 %}
+<h2 class="mb-3">Gallery</h2>
+<div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+  {% for p in photos|slice:"1:" %}
+  <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+    <a href="{{ p.image.url }}" target="_blank" rel="noopener"><img class="aspect-[4/3] w-full object-cover" loading="lazy" src="{{ p.image.url }}" alt="{{ p.caption|default:'Photo' }}"></a>
+    {% if p.caption %}<figcaption class="px-3 py-2 text-xs text-slate-500">{{ p.caption }}</figcaption>{% endif %}
+  </figure>
+  {% endfor %}
+</div>
+{% endif %}
+
+<h2 class="mt-10">Get in touch</h2>
+<p class="mt-2 text-slate-700">Questions? <a href="{% url 'contact' %}">Contact us</a>{% if user.is_authenticated and not user.is_staff %} or <a href="{% url 'new_thread' %}">send a message</a> from your account{% endif %}.</p>
+{% endblock %}

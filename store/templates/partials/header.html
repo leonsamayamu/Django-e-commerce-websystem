@@ -1,0 +1,62 @@
+{% if announcement %}<div class="bg-teal-900 px-4 py-2 text-center text-xs font-medium text-teal-50">{{ announcement }}</div>{% endif %}
+<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+  <div class="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
+    <button id="nav-toggle" type="button" class="rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:hidden" aria-controls="mobile-nav" aria-expanded="false" aria-label="Open menu">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <a class="flex items-center gap-2 text-lg font-extrabold tracking-tight text-slate-900 hover:text-teal-800" href="{% url 'product_list' %}">
+      <span class="grid h-9 w-9 place-items-center rounded-lg bg-teal-700 text-lg text-white" aria-hidden="true">🛍️</span>{{ shop_name }}
+    </a>
+    <form class="mx-4 hidden max-w-xl flex-1 md:flex" method="get" action="{% url 'product_list' %}" role="search">
+      <input type="search" name="q" value="{{ q|default:'' }}" placeholder="Search products" aria-label="Search products" class="!rounded-r-none">
+      <button class="btn !rounded-l-none" type="submit">Search</button>
+    </form>
+    <nav class="ml-auto hidden items-center gap-5 text-sm font-medium text-slate-700 lg:flex" aria-label="Main">
+      <a class="text-slate-700 hover:text-teal-800" href="{% url 'about' %}">About</a>
+      <a class="text-slate-700 hover:text-teal-800" href="{% url 'contact' %}">Contact</a>
+      {% if user.is_authenticated %}
+        {% if user.is_staff %}<a class="text-slate-700 hover:text-teal-800" href="{% url 'staff_dashboard' %}">Staff{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>
+        {% else %}<a class="text-slate-700 hover:text-teal-800" href="{% url 'inbox' %}">Messages{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>{% endif %}
+        <a class="flex items-center gap-2 text-slate-700 hover:text-teal-800" href="{% url 'profile' %}">
+          {% if user.profile.avatar %}<img class="h-7 w-7 rounded-full object-cover" src="{{ user.profile.avatar.url }}" alt="">{% else %}<span class="grid h-7 w-7 place-items-center rounded-full bg-teal-700 text-xs font-bold text-white" aria-hidden="true">{{ user.username|first|upper }}</span>{% endif %}
+          {{ user.first_name|default:user.username }}
+        </a>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-slate-500 hover:text-red-700" type="submit">Log out</button></form>
+      {% else %}
+        <a class="text-slate-700 hover:text-teal-800" href="{% url 'login' %}">Log in</a>
+        <a class="btn btn-sm" href="{% url 'register' %}">Register</a>
+      {% endif %}
+    </nav>
+    <a class="relative ml-auto rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:ml-0" href="{% url 'cart' %}" aria-label="Cart">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 11.2a2 2 0 002 1.6h7.7a2 2 0 002-1.5L21 8H6"/><circle cx="10" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/></svg>
+      <span id="cart-count" class="absolute -right-0.5 -top-0.5 grid min-h-[1.25rem] min-w-[1.25rem] place-items-center rounded-full bg-teal-700 px-1 text-[11px] font-bold text-white">{{ cart_count }}</span>
+    </a>
+  </div>
+
+  <nav id="mobile-nav" class="hidden border-t border-slate-200 bg-white px-4 py-3 lg:hidden" aria-label="Mobile">
+    <form class="mb-3 flex" method="get" action="{% url 'product_list' %}" role="search">
+      <input type="search" name="q" placeholder="Search products" aria-label="Search products" class="!rounded-r-none">
+      <button class="btn !rounded-l-none" type="submit">Search</button>
+    </form>
+    <div class="grid gap-1 text-sm font-medium">
+      <a class="side-link" href="{% url 'product_list' %}">Shop</a>
+      <a class="side-link" href="{% url 'about' %}">About</a>
+      <a class="side-link" href="{% url 'contact' %}">Contact</a>
+      {% if user.is_authenticated %}
+        {% if user.is_staff %}<a class="side-link" href="{% url 'staff_dashboard' %}">Staff area{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>
+        {% else %}<a class="side-link" href="{% url 'my_orders' %}">My orders</a><a class="side-link" href="{% url 'inbox' %}">Messages{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>{% endif %}
+        <a class="side-link" href="{% url 'profile' %}">My profile</a>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="side-link w-full text-red-700" type="submit">Log out</button></form>
+      {% else %}
+        <a class="side-link" href="{% url 'login' %}">Log in</a><a class="side-link" href="{% url 'register' %}">Register</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <nav class="hidden border-t border-slate-100 bg-slate-50 lg:block" aria-label="Categories">
+    <div class="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-1.5 text-sm">
+      <a class="rounded-md px-3 py-1 font-medium text-slate-700 hover:bg-white hover:text-teal-800" href="{% url 'product_list' %}">All products</a>
+      {% for c in nav_categories %}<a class="rounded-md px-3 py-1 text-slate-600 hover:bg-white hover:text-teal-800" href="{% url 'product_list' %}?category={{ c.pk }}">{{ c.name }}</a>{% endfor %}
+    </div>
+  </nav>
+</header>

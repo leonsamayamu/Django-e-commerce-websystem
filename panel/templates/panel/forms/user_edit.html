@@ -1,0 +1,9 @@
+<div class="grid gap-x-4 sm:grid-cols-2">
+  {% include "partials/field.html" with field=form.first_name %}
+  {% include "partials/field.html" with field=form.last_name %}
+  <div class="sm:col-span-2">{% include "partials/field.html" with field=form.email %}</div>
+  <div class="sm:col-span-2">{% include "partials/field.html" with field=form.role %}</div>
+  {% if form.staff_role %}<div class="sm:col-span-2">{% include "partials/field.html" with field=form.staff_role %}</div>{% endif %}
+  <div class="sm:col-span-2">{% include "partials/field.html" with field=form.is_active %}</div>
+</div>
+<p class="text-xs text-slate-500">To change this user's password use "Password" in the users list.</p>

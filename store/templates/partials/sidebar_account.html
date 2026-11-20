@@ -1,0 +1,16 @@
+<button class="sidebar-toggle btn btn-outline btn-sm mb-4 lg:hidden" type="button" aria-expanded="false" aria-controls="sidebar">My account menu</button>
+<aside id="sidebar" class="card mb-6 hidden lg:sticky lg:top-32 lg:mb-0 lg:block" aria-label="Account navigation">
+  <div class="mb-3 flex items-center gap-3 border-b border-slate-100 pb-4">
+    {% if user.profile.avatar %}<img class="h-12 w-12 rounded-full object-cover" src="{{ user.profile.avatar.url }}" alt="">{% else %}<span class="grid h-12 w-12 flex-none place-items-center rounded-full bg-teal-700 text-lg font-bold text-white" aria-hidden="true">{{ user.username|first|upper }}</span>{% endif %}
+    <div class="min-w-0"><p class="truncate font-semibold">{{ user.get_full_name|default:user.username }}</p><p class="truncate text-xs text-slate-500">{{ user.email }}</p></div>
+  </div>
+  {% with n=request.resolver_match.url_name %}
+  <ul class="space-y-0.5">
+    <li><a class="side-link {% if n == 'profile' %}side-link-active{% endif %}" href="{% url 'profile' %}">My profile</a></li>
+    <li><a class="side-link {% if n == 'my_orders' %}side-link-active{% endif %}" href="{% url 'my_orders' %}">My orders</a></li>
+    <li><a class="side-link {% if n == 'inbox' or n == 'new_thread' or n == 'thread' %}side-link-active{% endif %}" href="{% url 'inbox' %}"><span>Messages</span>{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a></li>
+    <li><a class="side-link {% if n == 'password_change' %}side-link-active{% endif %}" href="{% url 'password_change' %}">Change password</a></li>
+    <li><a class="side-link" href="{% url 'product_list' %}">Continue shopping</a></li>
+  </ul>
+  {% endwith %}
+</aside>

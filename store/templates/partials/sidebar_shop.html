@@ -1,0 +1,26 @@
+<button class="sidebar-toggle btn btn-outline btn-sm mb-4 lg:hidden" type="button" aria-expanded="false" aria-controls="sidebar">Filters &amp; menu</button>
+<aside id="sidebar" class="card mb-6 hidden lg:sticky lg:top-32 lg:mb-0 lg:block" aria-label="Shop navigation">
+  <p class="side-title">Categories</p>
+  <ul class="space-y-0.5">
+    <li><a class="side-link {% if not active_category %}side-link-active{% endif %}" href="{% url 'product_list' %}">All products</a></li>
+    {% for c in nav_categories %}
+    <li><a class="side-link {% if active_category == c.pk|stringformat:'s' %}side-link-active{% endif %}" href="{% url 'product_list' %}?category={{ c.pk }}"><span>{{ c.name }}</span><span class="text-xs opacity-70">{{ c.n }}</span></a></li>
+    {% endfor %}
+  </ul>
+  {% if page %}
+  <p class="side-title">Price ({{ currency }})</p>
+  <form method="get" class="grid grid-cols-2 gap-2 px-1">
+    {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+    {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+    <input type="number" name="min" min="0" step="any" placeholder="Min" value="{{ min }}" aria-label="Minimum price">
+    <input type="number" name="max" min="0" step="any" placeholder="Max" value="{{ max }}" aria-label="Maximum price">
+    <button class="btn btn-sm col-span-2" type="submit">Apply</button>
+  </form>
+  {% endif %}
+  <p class="side-title">Help</p>
+  <ul class="space-y-0.5">
+    <li><a class="side-link" href="{% url 'about' %}">About us</a></li>
+    <li><a class="side-link" href="{% url 'contact' %}">Contact us</a></li>
+    {% if user.is_authenticated and not user.is_staff %}<li><a class="side-link" href="{% url 'inbox' %}">Message the shop</a></li>{% endif %}
+  </ul>
+</aside>

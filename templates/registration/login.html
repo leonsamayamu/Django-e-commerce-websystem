@@ -1,0 +1,14 @@
+{% extends "store/base.html" %}
+{% block title %}Log in - {{ shop_name }}{% endblock %}
+{% block content %}
+<div class="mx-auto my-8 max-w-md"><div class="card p-6 sm:p-8">
+  <h1 class="mb-6">Log in</h1>
+  <form method="post">
+    {% csrf_token %}{% include "partials/form.html" %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn w-full" type="submit">Log in</button>
+  </form>
+  <p class="mt-4 text-center text-sm"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+  <p class="mt-2 text-center text-sm text-slate-500">New customer? <a href="{% url 'register' %}">Create an account</a>. Staff log in here too.</p>
+</div></div>
+{% endblock %}

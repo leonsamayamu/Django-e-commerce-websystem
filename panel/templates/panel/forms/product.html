@@ -1,0 +1,37 @@
+<div class="grid gap-x-4 sm:grid-cols-2">
+  <div class="sm:col-span-2">{% include "partials/field.html" with field=form.name %}</div>
+  {% include "partials/field.html" with field=form.category %}
+  {% include "partials/field.html" with field=form.price %}
+  <div>{% include "partials/field.html" with field=form.stock %}</div>
+  <div class="pt-6">{% include "partials/field.html" with field=form.available %}</div>
+  <div class="sm:col-span-2">{% include "partials/field.html" with field=form.description %}</div>
+  <div class="sm:col-span-2">{% include "partials/field.html" with field=form.image_url %}</div>
+</div>
+<fieldset class="mt-2 rounded-xl border border-slate-200 p-4">
+  <legend class="px-2 text-sm font-semibold text-slate-700">Photos</legend>
+  {% if product and product.images.all %}
+  <div class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    {% for img in product.images.all %}
+    <div class="text-xs">
+      <img class="aspect-square w-full rounded-lg object-cover" src="{{ img.image.url }}" alt="Photo {{ forloop.counter }}">
+      <label class="mt-1 flex items-center gap-1"><input type="radio" name="cover" value="{{ img.pk }}" {% if forloop.first %}checked{% endif %}> Cover</label>
+      <label class="flex items-center gap-1 text-red-700"><input type="checkbox" name="delete_images" value="{{ img.pk }}"> Remove</label>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% include "partials/field.html" with field=form.new_images %}
+  <div id="upload-preview" class="grid grid-cols-2 gap-3 sm:grid-cols-4"></div>
+</fieldset>
+
+<fieldset class="mt-4 rounded-xl border border-slate-200 p-4" data-variants-box>
+  <legend class="px-2 text-sm font-semibold text-slate-700">Options (size, colour...)</legend>
+  <p class="mb-3 text-xs text-slate-500">Add options if customers must choose something. Each option has its own stock, and the product's own stock above is then ignored. Leave empty for a simple product.</p>
+  {{ formset.management_form }}
+  {% if formset.non_form_errors %}<div class="alert alert-error">{{ formset.non_form_errors }}</div>{% endif %}
+  <div class="space-y-2" data-variant-rows>
+    {% for f in formset %}{% include "panel/forms/variant_row.html" with f=f %}{% endfor %}
+  </div>
+  <template data-variant-template>{% include "panel/forms/variant_row.html" with f=formset.empty_form %}</template>
+  <button type="button" class="btn btn-outline btn-sm mt-3" data-add-variant>+ Add option</button>
+</fieldset>

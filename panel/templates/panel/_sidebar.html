@@ -1,0 +1,52 @@
+{% load panel_ui %}
+<aside id="panel-sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full transform flex-col bg-slate-900 text-slate-300 transition-transform duration-200 lg:static lg:translate-x-0" aria-label="Admin navigation">
+  <a href="{% url 'staff_dashboard' %}" class="flex h-14 flex-none items-center gap-2 border-b border-slate-800 px-4 text-lg font-extrabold text-white hover:text-white">
+    <span class="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">{% icon "shopping-bag" "h-5 w-5" %}</span>{{ shop_name }}
+  </a>
+  {% with n=request.resolver_match.url_name %}
+  <nav class="flex-1 overflow-y-auto px-3 pb-6">
+    <a class="nav-link mt-4 {% if n == 'staff_dashboard' %}nav-link-active{% endif %}" href="{% url 'staff_dashboard' %}">{% icon "squares-2x2" %}Dashboard</a>
+    {% if "analytics" in caps %}<a class="nav-link {% if 'staff_analytics' in n %}nav-link-active{% endif %}" href="{% url 'staff_analytics' %}">{% icon "chart-bar" %}Analytics</a>{% endif %}
+
+    {% if "catalog" in caps %}
+    <p class="nav-title">Catalog</p>
+    <a class="nav-link {% if 'staff_product' in n %}nav-link-active{% endif %}" href="{% url 'staff_products' %}">{% icon "cube" %}Products</a>
+    <a class="nav-link {% if 'staff_categor' in n %}nav-link-active{% endif %}" href="{% url 'staff_categories' %}">{% icon "tag" %}Categories</a>
+    {% endif %}
+
+    {% if "orders" in caps or "payments_view" in caps %}
+    <p class="nav-title">Sales</p>
+    {% if "orders" in caps %}<a class="nav-link {% if 'staff_order' in n %}nav-link-active{% endif %}" href="{% url 'staff_orders' %}">{% icon "clipboard-document-list" %}{% if staff_role_label == "Delivery" %}My deliveries{% else %}Orders{% endif %}</a>{% endif %}
+    {% if "payments_view" in caps %}<a class="nav-link {% if n == 'staff_payments' %}nav-link-active{% endif %}" href="{% url 'staff_payments' %}">{% icon "banknotes" %}Payments</a>{% endif %}
+    {% endif %}
+
+    {% if "customers" in caps or "messages" in caps or "inquiries" in caps or "reviews" in caps %}
+    <p class="nav-title">People</p>
+    {% if "customers" in caps %}<a class="nav-link {% if 'staff_user' in n %}nav-link-active{% endif %}" href="{% url 'staff_users' %}">{% icon "users" %}Users</a>{% endif %}
+    {% if "messages" in caps %}<a class="nav-link {% if n == 'staff_messages' or n == 'staff_thread' %}nav-link-active{% endif %}" href="{% url 'staff_messages' %}">{% icon "chat-bubble-left-right" %}Messages{% if unread_messages %}<span class="count ml-auto">{{ unread_messages }}</span>{% endif %}</a>{% endif %}
+    {% if "inquiries" in caps %}<a class="nav-link {% if 'staff_contact' in n %}nav-link-active{% endif %}" href="{% url 'staff_contacts' %}">{% icon "envelope" %}Inquiries{% if new_contacts %}<span class="count ml-auto">{{ new_contacts }}</span>{% endif %}</a>{% endif %}
+    {% if "reviews" in caps %}<a class="nav-link {% if 'staff_review' in n %}nav-link-active{% endif %}" href="{% url 'staff_reviews' %}">{% icon "check-circle" %}Reviews</a>{% endif %}
+    {% endif %}
+
+    {% if "marketing" in caps or "content" in caps %}
+    <p class="nav-title">Marketing &amp; content</p>
+    {% if "marketing" in caps %}
+    <a class="nav-link {% if 'staff_subscriber' in n %}nav-link-active{% endif %}" href="{% url 'staff_subscribers' %}">{% icon "envelope-open" %}Subscribers{% if subs_active %}<span class="ml-auto rounded-full bg-slate-700 px-2 text-[11px] font-semibold leading-5 text-slate-100">{{ subs_active }}</span>{% endif %}</a>
+    <a class="nav-link {% if n == 'staff_newsletter' %}nav-link-active{% endif %}" href="{% url 'staff_newsletter' %}">{% icon "megaphone" %}Newsletter</a>
+    {% endif %}
+    {% if "content" in caps %}<a class="nav-link {% if 'staff_about' in n or 'staff_section' in n or 'staff_photo' in n %}nav-link-active{% endif %}" href="{% url 'staff_about' %}">{% icon "pencil-square" %}About page</a>{% endif %}
+    {% endif %}
+
+    {% if "admin" in caps %}
+    <p class="nav-title">Shop admin</p>
+    <a class="nav-link {% if 'staff_gateway' in n %}nav-link-active{% endif %}" href="{% url 'staff_gateways' %}">{% icon "banknotes" %}Payment gateways</a>
+    <a class="nav-link {% if 'staff_assistant' in n or 'staff_command' in n %}nav-link-active{% endif %}" href="{% url 'staff_assistant' %}">{% icon "chat-bubble-left-right" %}AI assistant</a>
+    <a class="nav-link {% if 'staff_settings' in n %}nav-link-active{% endif %}" href="{% url 'staff_settings' %}">{% icon "cog-6-tooth" %}Store settings</a>
+    <a class="nav-link" href="/admin/">{% icon "cog-6-tooth" %}Django admin</a>
+    {% endif %}
+
+    <p class="nav-title">Site</p>
+    <a class="nav-link" href="{% url 'product_list' %}">{% icon "shopping-cart" %}View shop</a>
+  </nav>
+  {% endwith %}
+</aside>

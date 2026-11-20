@@ -1,0 +1,36 @@
+{% extends "panel/base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <h1>Users</h1>
+  <a class="btn" data-modal href="{% url 'staff_user_new' %}">+ Add user</a>
+</div>
+<form method="get" class="mb-4 flex flex-wrap items-center gap-2" role="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search name, username, email" class="!w-64">
+  <select name="role" class="!w-auto"><option value="">All users</option><option value="customers" {% if role == 'customers' %}selected{% endif %}>Customers</option><option value="staff" {% if role == 'staff' %}selected{% endif %}>Staff</option><option value="inactive" {% if role == 'inactive' %}selected{% endif %}>Inactive</option><option value="subscribed" {% if role == 'subscribed' %}selected{% endif %}>Newsletter subscribers</option></select>
+  <button class="btn btn-outline" type="submit">Filter</button>
+  {% if q or role %}<a class="text-sm" href="{% url 'staff_users' %}">Clear</a>{% endif %}
+</form>
+<div class="overflow-x-auto"><table class="tbl">
+  <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Newsletter</th><th>Orders</th><th>Joined</th><th></th></tr></thead>
+  <tbody>
+  {% for u in rows %}
+  <tr>
+    <td><div class="flex items-center gap-3">
+      {% if u.profile.avatar %}<img class="h-9 w-9 rounded-full object-cover" src="{{ u.profile.avatar.url }}" alt="">{% else %}<span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-slate-200 text-sm font-bold text-slate-600" aria-hidden="true">{{ u.username|first|upper }}</span>{% endif %}
+      <div><p class="font-medium">{{ u.get_full_name|default:u.username }}</p><p class="text-xs text-slate-500">@{{ u.username }} &middot; {{ u.email }}</p></div></div></td>
+    <td>{% if u.is_superuser %}<span class="badge badge-processing">Shop admin</span>{% elif u.is_staff %}<span class="badge badge-processing">{{ u.profile.get_staff_role_display|default:"Manager" }}</span>{% else %}<span class="badge">Customer</span>{% endif %}</td>
+    <td>{% if u.is_active %}<span class="badge badge-ok">Active</span>{% else %}<span class="badge badge-cancelled">Inactive</span>{% endif %}</td>
+    <td>{% if u.subscribed %}<span class="badge badge-ok">Subscribed</span>{% else %}<span class="text-xs text-slate-400">-</span>{% endif %}</td>
+    <td>{{ u.order_count }}</td><td>{{ u.date_joined|date:"j M Y" }}</td>
+    <td class="whitespace-nowrap text-right">
+      {% if u.can_edit %}<a class="btn btn-outline btn-sm" data-modal href="{% url 'staff_user_edit' u.pk %}">Edit</a> <a class="btn btn-outline btn-sm" data-modal href="{% url 'staff_user_password' u.pk %}">Password</a>{% endif %}
+      {% if u.can_remove %}<a class="btn btn-outline btn-sm" data-modal href="{% url 'staff_user_toggle' u.pk %}">{% if u.is_active %}Deactivate{% else %}Activate{% endif %}</a>{% if user.is_superuser %} <a class="btn btn-danger btn-sm" data-modal href="{% url 'staff_user_delete' u.pk %}">Delete</a>{% endif %}{% endif %}
+    </td>
+  </tr>
+  {% empty %}<tr><td colspan="7" class="py-8 text-center text-slate-500">No users found.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% include "panel/_pagination.html" %}
+<p class="mt-4 text-xs text-slate-500">Staff roles: Manager, Warehouse, Delivery, Customer support, Marketing. Only shop admins can create or change staff accounts and delete users.</p>
+{% endblock %}

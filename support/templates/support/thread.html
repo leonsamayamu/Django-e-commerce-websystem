@@ -1,0 +1,10 @@
+{% extends "store/base.html" %}
+{% block title %}{{ thread.subject }}{% endblock %}
+{% block layout_class %}with-sidebar{% endblock %}
+{% block sidebar %}{% include "partials/sidebar_account.html" %}{% endblock %}
+{% block content %}
+<p class="mb-3 text-sm"><a href="{% url 'inbox' %}">&larr; All messages</a></p>
+<h1>{{ thread.subject }}</h1>
+
+{% include "support/_chat.html" %}
+{% endblock %}

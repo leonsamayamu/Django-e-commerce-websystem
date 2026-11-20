@@ -1,0 +1,21 @@
+{% extends "panel/base.html" %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <h1>Payments</h1>
+  <form method="get" class="flex gap-2" role="search">{% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}<input type="search" name="q" value="{{ q }}" placeholder="Reference, receipt, phone, order #" class="!w-72"><button class="btn btn-outline" type="submit">Search</button></form>
+</div>
+<nav class="mb-4 flex flex-wrap gap-2" aria-label="Filter by status"><a class="chip {% if not status %}chip-active{% endif %}" href="{% url 'staff_payments' %}">All</a>{% for key, label in statuses %}<a class="chip {% if status == key %}chip-active{% endif %}" href="?status={{ key }}">{{ label }}</a>{% endfor %}</nav>
+<div class="overflow-x-auto"><table class="tbl">
+  <thead><tr><th>Date</th><th>Order</th><th>Amount</th><th>Phone</th><th>Gateway</th><th>Status</th><th>Receipt / note</th><th></th></tr></thead>
+  <tbody>
+  {% for p in page %}
+  <tr><td>{{ p.created|date:"j M H:i" }}</td><td><a class="font-semibold" href="{% url 'staff_order_detail' p.order_id %}">#{{ p.order_id }}</a><br><span class="text-xs text-slate-500">{{ p.order.name }}</span></td><td>{{ currency }} {{ p.amount }}</td><td>{{ p.phone }}</td><td class="text-xs">{{ p.gateway|default:"-" }}</td>
+      <td><span class="badge {% if p.status == 'success' %}badge-ok{% elif p.status == 'failed' %}badge-cancelled{% else %}badge-pending{% endif %}">{{ p.get_status_display }}</span></td>
+      <td class="max-w-xs text-xs text-slate-600">{{ p.receipt|default:p.message }}</td>
+      <td class="text-right">{% if p.status == "pending" %}<form method="post" action="{% url 'staff_payment_recheck' p.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-outline btn-sm" type="submit">Re-check</button></form>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="8" class="py-8 text-center text-slate-500">No payments yet.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% include "panel/_pagination.html" %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "store/base.html" %}
+{% block title %}Contact us - {{ shop_name }}{% endblock %}
+{% block layout_class %}with-sidebar{% endblock %}
+{% block sidebar %}{% include "partials/sidebar_shop.html" %}{% endblock %}
+{% block content %}
+<h1 class="mb-6">Contact us</h1>
+<div class="grid gap-6 xl:grid-cols-[1fr_18rem]">
+  <form method="post" class="card">{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">Send message</button></form>
+  <aside class="card h-fit text-sm text-slate-700">
+    <h2 class="mb-2 text-lg">Other ways to reach us</h2>
+    <p>Email: <a href="mailto:{{ shop_email }}">{{ shop_email }}</a></p>
+    {% if user.is_authenticated and not user.is_staff %}<p class="mt-2"><a href="{% url 'new_thread' %}">Message us from your account</a> to keep the conversation in one place.</p>{% endif %}
+  </aside>
+</div>
+{% endblock %}

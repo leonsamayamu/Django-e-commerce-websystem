@@ -1,0 +1,27 @@
+{% extends "panel/base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <h1>{% if staff_role_label == "Delivery" %}My deliveries{% else %}Orders{% endif %}</h1>
+  <form method="get" class="flex gap-2" role="search">{% if active %}<input type="hidden" name="status" value="{{ active }}">{% endif %}<input type="search" name="q" value="{{ q }}" placeholder="Search # / name / email" class="!w-64"><button class="btn btn-outline" type="submit">Search</button></form>
+</div>
+<nav class="mb-4 flex flex-wrap gap-2" aria-label="Filter by status">
+  <a class="chip {% if not active %}chip-active{% endif %}" href="{% url 'staff_orders' %}">All</a>
+  {% for key, label in statuses %}<a class="chip {% if active == key %}chip-active{% endif %}" href="?status={{ key }}">{{ label }}</a>{% endfor %}
+</nav>
+<div class="overflow-x-auto"><table class="tbl">
+  <thead><tr><th>#</th><th>Customer</th><th>Date</th><th>Total</th><th>Payment</th><th>Status</th><th>Courier</th><th></th></tr></thead>
+  <tbody>
+  {% for o in page %}
+  <tr><td><a class="font-semibold" href="{% url 'staff_order_detail' o.pk %}">{{ o.pk }}</a></td>
+      <td>{{ o.name }}{% if not o.user_id %} <span class="badge">Guest</span>{% endif %}<br><span class="text-xs text-slate-500">{{ o.email }}</span></td>
+      <td>{{ o.created|date:"j M H:i" }}</td><td>{{ o.t|default:0 }}</td>
+      <td>{{ o.get_payment_method_display }}<br>{% if o.paid %}<span class="badge badge-ok">Paid</span>{% else %}<span class="badge badge-pending">Unpaid</span>{% endif %}</td>
+      <td><span class="badge badge-{{ o.status }}">{{ o.get_status_display }}</span></td>
+      <td class="text-xs">{% if o.courier %}{{ o.courier.get_full_name|default:o.courier.username }}{% else %}<span class="text-slate-400">-</span>{% endif %}</td>
+      <td class="whitespace-nowrap text-right"><a class="btn btn-outline btn-sm" href="{% url 'staff_order_detail' o.pk %}">View</a>{% if "orders_fulfil" in caps %} <a class="btn btn-sm" data-modal href="{% url 'staff_order_status' o.pk %}">Update</a>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="8" class="py-8 text-center text-slate-500">No orders.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% include "panel/_pagination.html" %}
+{% endblock %}

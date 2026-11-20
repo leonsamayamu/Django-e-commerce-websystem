@@ -1,0 +1,45 @@
+{% load static panel_ui %}<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Panel{% endblock %} - {{ shop_name }}</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+  <link rel="stylesheet" href="{% static 'store/tailwind.css' %}">
+</head>
+<body class="h-full bg-slate-100">
+<a href="#main" class="sr-only z-50 rounded-lg bg-white px-4 py-2 text-teal-800 shadow focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
+<div class="flex min-h-screen">
+  {% include "panel/_sidebar.html" %}
+  <div id="panel-overlay" class="fixed inset-0 z-30 hidden bg-slate-900/50 lg:hidden"></div>
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4">
+      <button id="panel-toggle" type="button" class="rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:hidden" aria-controls="panel-sidebar" aria-expanded="false" aria-label="Open menu">
+        {% icon "bars-3" "h-6 w-6" %}
+      </button>
+      <p class="text-sm font-semibold text-slate-700">{% block topbar %}Admin panel{% endblock %}</p>
+      <div class="ml-auto flex items-center gap-4 text-sm">
+        <a href="{% url 'product_list' %}" target="_blank" rel="noopener" class="hidden text-slate-600 hover:text-teal-800 sm:inline">View shop {% icon "arrow-up-right" "inline h-3.5 w-3.5" %}</a>
+        {% if user.is_superuser %}<a href="/admin/" class="hidden text-slate-600 hover:text-teal-800 sm:inline">Django admin</a>{% endif %}
+        <span class="hidden items-center gap-2 border-l border-slate-200 pl-4 md:flex">
+          <span class="grid h-8 w-8 place-items-center rounded-full bg-teal-700 text-xs font-bold text-white" aria-hidden="true">{{ user.username|first|upper }}</span>
+          <span class="text-slate-700">{{ user.get_full_name|default:user.username }}{% if staff_role_label %} <span class="badge">{{ staff_role_label }}</span>{% endif %}</span>
+        </span>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="text-slate-500 hover:text-red-700">Log out</button></form>
+      </div>
+    </header>
+    <main id="main" class="flex-1 p-4 sm:p-6">
+      {% for m in messages %}<div class="alert alert-{{ m.tags }}" role="status" data-autodismiss>{{ m }}</div>{% endfor %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<dialog id="modal" class="m-auto w-[calc(100%-1.5rem)] max-w-3xl rounded-2xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm" aria-labelledby="modal-title">
+  <div id="modal-content"></div>
+</dialog>
+<script src="{% static 'panel/panel.js' %}" defer></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,16 @@
+{% extends "store/base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<h1>Orders</h1>
+<nav class="chips">
+  <a class="chip {% if not active %}active{% endif %}" href="{% url 'staff_orders' %}">All</a>
+  {% for key, label in statuses %}<a class="chip {% if active == key %}active{% endif %}" href="?status={{ key }}">{{ label }}</a>{% endfor %}
+</nav>
+<div class="table-wrap"><table>
+  <tr><th>#</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr>
+  {% for o in orders %}
+  <tr><td><a href="{% url 'staff_order_detail' o.pk %}">{{ o.pk }}</a></td><td>{{ o.name }}</td><td>{{ o.created|date:"j M H:i" }}</td>
+      <td>{{ o.n }}</td><td>{{ o.total }}</td><td><span class="badge {{ o.status }}">{{ o.get_status_display }}</span>{% if o.paid %} Paid{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="6">No orders.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

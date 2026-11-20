@@ -1,0 +1,9 @@
+<div class="my-6 flex flex-col gap-3">
+  {% for m in thread_messages %}
+  <div class="bubble {% if m.from_staff %}bubble-staff{% else %}bubble-mine{% endif %}">
+    <p class="text-xs text-slate-500">{% if m.from_staff %}Shop team{% else %}{{ thread.customer.get_full_name|default:thread.customer.username }}{% endif %} &middot; {{ m.created|date:"j M H:i" }}</p>
+    <p class="mt-1 text-sm">{{ m.body|linebreaksbr }}</p>
+  </div>
+  {% endfor %}
+</div>
+<form method="post" class="card">{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">Send reply</button></form>

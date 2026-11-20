@@ -1,0 +1,22 @@
+{% extends "store/base.html" %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block content %}
+<h1>Order #{{ order.pk }}</h1>
+<div class="checkout">
+  <div class="card">
+    <h3>Customer</h3>
+    <p>{{ order.name }}<br>{{ order.email }}<br>{{ order.phone }}</p>
+    <p>{{ order.address|linebreaksbr }}</p>
+    <h3>Items</h3>
+    {% for i in order.items.all %}<p>{{ i.quantity }} &times; {{ i.product.name }} <span class="right">{{ i.line_total }}</span></p>{% endfor %}
+    <p class="total">Total: {{ currency }} {{ order.total }}</p>
+  </div>
+  <form method="post" class="form card">
+    {% csrf_token %}
+    <h3>Update</h3>
+    {{ form.as_p }}
+    <button class="btn" type="submit">Save</button>
+    <a href="{% url 'staff_orders' %}">Back</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+<div class="grid grid-cols-2 items-start gap-2 rounded-lg bg-slate-50 p-2 sm:grid-cols-12" data-variant-row>
+  {% for h in f.hidden_fields %}{{ h }}{% endfor %}
+  <div class="col-span-2 sm:col-span-4"><label class="sr-only" for="{{ f.name.id_for_label }}">Name</label>{{ f.name }}{{ f.name.errors }}</div>
+  <div class="sm:col-span-2"><label class="sr-only" for="{{ f.sku.id_for_label }}">SKU</label><input type="text" name="{{ f.sku.html_name }}" id="{{ f.sku.id_for_label }}" value="{{ f.sku.value|default_if_none:'' }}" placeholder="SKU"></div>
+  <div class="sm:col-span-2">{{ f.price }}{{ f.price.errors }}</div>
+  <div class="sm:col-span-2">{{ f.stock }}{{ f.stock.errors }}</div>
+  <div class="col-span-2 flex items-center justify-between gap-3 sm:col-span-2">
+    <label class="flex items-center gap-1 text-xs">{{ f.available }} Active</label>
+    <label class="flex items-center gap-1 text-xs text-red-700">{{ f.DELETE }} Remove</label>
+  </div>
+  <div class="hidden">{{ f.position }}</div>
+</div>

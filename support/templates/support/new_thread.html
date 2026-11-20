@@ -1,0 +1,8 @@
+{% extends "store/base.html" %}
+{% block title %}New message - {{ shop_name }}{% endblock %}
+{% block layout_class %}with-sidebar{% endblock %}
+{% block sidebar %}{% include "partials/sidebar_account.html" %}{% endblock %}
+{% block content %}
+<h1 class="mb-6">New message</h1>
+<form method="post" class="card max-w-2xl">{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">Send</button> <a class="ml-2 text-sm" href="{% url 'inbox' %}">Cancel</a></form>
+{% endblock %}

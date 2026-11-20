@@ -1,0 +1,30 @@
+{% extends "panel/base.html" %}
+{% load panel_ui %}
+{% block title %}Payment gateways{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <div><h1>Payment gateways</h1><p class="text-sm text-slate-500">Connect your <a href="https://payhero.co.ke" target="_blank" rel="noopener">PayHero</a> channels so customers can pay with M-Pesa at checkout.</p></div>
+  <a class="btn" data-modal href="{% url 'staff_gateway_new' %}">{% icon "plus" "h-4 w-4" %}Add gateway</a>
+</div>
+<div class="overflow-x-auto"><table class="tbl">
+  <thead><tr><th>Name</th><th>Type</th><th>Channel ID</th><th>Credentials</th><th>Status</th><th>Payments</th><th></th></tr></thead>
+  <tbody>
+  {% for g in gateways %}
+  <tr>
+    <td class="font-medium">{{ g.name }}</td><td class="text-xs">{{ g.get_provider_display }}</td><td>{{ g.channel_id }}</td>
+    <td>{% if g.has_credentials %}<span class="badge badge-ok">Saved</span> <span class="text-xs text-slate-500">{{ g.masked_username }}</span>{% else %}<span class="badge badge-cancelled">Missing</span>{% endif %}</td>
+    <td>{% if g.enabled %}<span class="badge badge-ok">Live at checkout</span>{% else %}<span class="badge">Off</span>{% endif %}</td>
+    <td>{{ g.n }}</td>
+    <td class="whitespace-nowrap text-right"><a class="btn btn-outline btn-sm" data-modal href="{% url 'staff_gateway_edit' g.pk %}">Edit</a> <a class="btn btn-danger btn-sm" data-modal href="{% url 'staff_gateway_delete' g.pk %}">Delete</a></td>
+  </tr>
+  <tr class="bg-slate-50"><td colspan="7" class="text-xs text-slate-600">Callback URL for this gateway: <code class="select-all break-all rounded bg-white px-1.5 py-0.5">{{ g.callback }}</code></td></tr>
+  {% empty %}<tr><td colspan="7" class="py-8 text-center text-slate-500">No gateways yet. Add one to accept M-Pesa payments.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+<div class="mt-6 grid gap-4 lg:grid-cols-2">
+  <section class="card text-sm text-slate-700"><h2 class="text-base">How to set up</h2>
+    <ol class="mt-2 list-decimal space-y-1 pl-5"><li>In your PayHero dashboard create a payment channel and note its <strong>Channel ID</strong>.</li><li>Create <strong>API keys</strong> (username and password) under Account.</li><li>Click <strong>Add gateway</strong> and paste them here. They are encrypted and never shown again.</li><li>Make sure the shop is reachable at a public https address and set <code>PUBLIC_BASE_URL</code>, so PayHero can send payment confirmations.</li></ol></section>
+  <section class="card text-sm text-slate-700"><h2 class="text-base">Safety</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-5"><li>Orders are marked paid only after the shop confirms the payment with PayHero directly, never from the callback alone.</li><li>Amounts are re-checked against the order total.</li><li>{% if public_url_set %}Public URL is configured.{% else %}<span class="font-medium text-amber-700">PUBLIC_BASE_URL is not set.</span> Customers' payments still complete (the checkout page confirms them), but PayHero's own callbacks cannot reach a local computer.{% endif %}</li></ul></section>
+</div>
+{% endblock %}

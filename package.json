@@ -1,0 +1,16 @@
+{
+  "name": "django-shop-frontend",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i frontend/input.css -o store/static/store/tailwind.css --minify",
+    "watch:css": "tailwindcss -c tailwind.config.js -i frontend/input.css -o store/static/store/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "tailwindcss": "^3.4.10"
+  },
+  "dependencies": {
+    "chart.js": "^4.6.1",
+    "heroicons": "^2.2.0"
+  }
+}

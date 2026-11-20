@@ -1,0 +1,21 @@
+{% extends "panel/base.html" %}
+{% block title %}Store settings{% endblock %}
+{% block content %}
+<div class="mb-6 flex items-center justify-between"><div><h1>Store settings</h1><p class="text-sm text-slate-500">Business details printed on invoices, and checkout options.</p></div><a class="btn" data-modal href="{% url 'staff_settings_edit' %}">Edit settings</a></div>
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="card text-sm"><h2 class="text-base">Invoice details</h2>
+    <dl class="mt-3 grid grid-cols-[9rem_1fr] gap-y-2 text-slate-700">
+      <dt class="text-slate-500">Business name</dt><dd>{{ cfg.business_name }}</dd>
+      <dt class="text-slate-500">Address</dt><dd class="whitespace-pre-line">{{ cfg.address|default:"-" }}</dd>
+      <dt class="text-slate-500">Phone / email</dt><dd>{{ cfg.phone|default:"-" }} / {{ cfg.email|default:"-" }}</dd>
+      <dt class="text-slate-500">Tax PIN</dt><dd>{{ cfg.tax_pin|default:"-" }}</dd>
+      <dt class="text-slate-500">VAT rate</dt><dd>{{ cfg.tax_rate|floatformat:"-2" }}% (prices include VAT)</dd>
+      <dt class="text-slate-500">Invoice prefix</dt><dd>{{ cfg.invoice_prefix }}000123</dd>
+      <dt class="text-slate-500">Footer note</dt><dd>{{ cfg.invoice_footer|default:"-" }}</dd>
+    </dl></section>
+  <section class="card text-sm"><h2 class="text-base">Checkout</h2>
+    <p class="mt-3 flex items-center justify-between"><span>Pay on delivery</span>{% if cfg.cod_enabled %}<span class="badge badge-ok">Allowed</span>{% else %}<span class="badge">Off</span>{% endif %}</p>
+    <p class="mt-2 flex items-center justify-between"><span>Guest checkout</span>{% if cfg.guest_checkout %}<span class="badge badge-ok">Allowed</span>{% else %}<span class="badge">Login required</span>{% endif %}</p>
+    <p class="mt-4 text-xs text-slate-500">Online payments are configured under Payment gateways.</p></section>
+</div>
+{% endblock %}

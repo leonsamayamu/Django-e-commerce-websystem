@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% load i18n unfold %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block branding %}{% include "unfold/helpers/site_branding.html" %}{% endblock %}
+{% block content %}
+  {% component "unfold/components/container.html" %}
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      {% for k in kpis %}
+        {% component "unfold/components/card.html" with icon=k.icon %}
+          {% component "unfold/components/text.html" %}{{ k.label }}{% endcomponent %}
+          {% component "unfold/components/title.html" %}{{ k.value }}{% endcomponent %}
+        {% endcomponent %}
+      {% endfor %}
+    </div>
+    <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {% component "unfold/components/card.html" with title="Sales, last 7 days" class="lg:col-span-2" %}
+        {% component "unfold/components/chart/bar.html" with data=sales_chart height=220 %}{% endcomponent %}
+      {% endcomponent %}
+      {% component "unfold/components/card.html" with title="Quick links" %}
+        <div class="flex flex-col gap-2 text-sm">
+          <a class="text-primary-600 hover:underline dark:text-primary-500" href="{% url 'admin:store_product_add' %}">+ Add a product</a>
+          <a class="text-primary-600 hover:underline dark:text-primary-500" href="{% url 'admin:store_order_changelist' %}?status__exact=pending">Review pending orders</a>
+          <a class="text-primary-600 hover:underline dark:text-primary-500" href="{% url 'admin:support_subscriber_changelist' %}?active__exact=1">Active subscribers</a>
+          <a class="text-primary-600 hover:underline dark:text-primary-500" href="/staff/analytics/">Full analytics</a>
+        </div>
+      {% endcomponent %}
+    </div>
+    {% include "unfold/helpers/dashboard_default.html" %}
+  {% endcomponent %}
+{% endblock %}

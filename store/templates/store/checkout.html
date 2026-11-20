@@ -1,0 +1,77 @@
+{% extends "store/base.html" %}
+<<<<<<< HEAD
+{% block title %}Checkout - {{ shop_name }}{% endblock %}
+{% block content %}
+<h1 class="mb-2">Checkout</h1>
+{% if not user.is_authenticated %}<p class="mb-6 text-sm text-slate-600">Checking out as a guest. <a href="{% url 'login' %}?next={% url 'checkout' %}">Log in</a> to use your saved details and see all your orders.</p>{% endif %}
+{% if not gateways and not cod_enabled %}
+<div class="alert alert-error">Checkout is temporarily unavailable. Please <a href="{% url 'contact' %}">contact us</a>.</div>
+{% else %}
+<form method="post" class="grid gap-8 lg:grid-cols-[1fr_22rem]">
+  {% csrf_token %}
+  <div class="space-y-6">
+    <section class="card">
+      <h2 class="mb-4 text-lg">Delivery details</h2>
+      <div class="grid gap-x-4 sm:grid-cols-2">
+        <div class="mb-4"><label for="name" class="mb-1 block text-sm font-medium text-slate-700">Full name</label><input id="name" name="name" required value="{{ values.name }}" autocomplete="name"></div>
+        <div class="mb-4"><label for="email" class="mb-1 block text-sm font-medium text-slate-700">Email</label><input id="email" type="email" name="email" required value="{{ values.email }}" autocomplete="email"></div>
+        <div class="mb-4 sm:col-span-2"><label for="phone" class="mb-1 block text-sm font-medium text-slate-700">Phone (for delivery)</label><input id="phone" name="phone" required value="{{ values.phone }}" autocomplete="tel" placeholder="0712 345 678"></div>
+        <div class="mb-4 sm:col-span-2"><label for="address" class="mb-1 block text-sm font-medium text-slate-700">Delivery address</label><textarea id="address" name="address" rows="3" required>{{ values.address }}</textarea></div>
+        <div class="sm:col-span-2"><label for="notes" class="mb-1 block text-sm font-medium text-slate-700">Delivery notes (optional)</label><input id="notes" name="notes" maxlength="500" value="{{ values.notes }}" placeholder="Landmark, gate code..."></div>
+      </div>
+    </section>
+    <section class="card" id="payment">
+      <h2 class="mb-4 text-lg">Payment</h2>
+      <div class="space-y-3">
+        {% if gateways %}
+        <label class="flex cursor-pointer gap-3 rounded-lg border border-slate-200 p-3 has-[:checked]:border-teal-600 has-[:checked]:bg-teal-50">
+          <input type="radio" name="payment_method" value="payhero" class="mt-1" {% if values.payment_method == 'payhero' %}checked{% endif %}>
+          <span class="flex-1"><span class="font-medium">Pay now with M-Pesa</span><br><span class="text-sm text-slate-500">We send a prompt to your phone. Enter your PIN to pay.</span>
+            <span class="mt-3 grid gap-3 sm:grid-cols-2" data-pay-fields>
+              {% if gateways|length > 1 %}<select name="gateway" aria-label="Payment channel">{% for g in gateways %}<option value="{{ g.pk }}">{{ g.name }}</option>{% endfor %}</select>{% else %}<input type="hidden" name="gateway" value="{{ gateways.0.pk }}">{% endif %}
+              <input name="mpesa_phone" value="{{ values.mpesa_phone }}" placeholder="M-Pesa number (if different)" aria-label="M-Pesa number" autocomplete="tel">
+            </span></span>
+        </label>
+        {% endif %}
+        {% if cod_enabled %}
+        <label class="flex cursor-pointer gap-3 rounded-lg border border-slate-200 p-3 has-[:checked]:border-teal-600 has-[:checked]:bg-teal-50">
+          <input type="radio" name="payment_method" value="cod" class="mt-1" {% if values.payment_method == 'cod' or not gateways %}checked{% endif %}>
+          <span><span class="font-medium">Pay on delivery</span><br><span class="text-sm text-slate-500">Pay the courier when your order arrives.</span></span>
+        </label>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+  <aside class="card h-fit lg:sticky lg:top-32">
+    <h2 class="text-lg">Order summary</h2>
+    <ul class="mt-3 divide-y divide-slate-100 text-sm">
+      {% for i in items %}<li class="flex justify-between gap-3 py-2"><span>{{ i.quantity }} &times; {{ i.name }}</span><span>{{ i.line_total }}</span></li>{% endfor %}
+    </ul>
+    <p class="mt-3 flex justify-between border-t border-slate-200 pt-3 text-lg font-bold"><span>Total</span><span>{{ currency }} {{ total }}</span></p>
+    <button class="btn mt-5 w-full" type="submit">Place order</button>
+    <p class="mt-3 text-xs text-slate-500">You will get an email with a link to track your order and download your invoice.</p>
+  </aside>
+</form>
+{% endif %}
+=======
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<h1>Checkout</h1>
+<div class="checkout">
+  <form method="post" class="form">
+    {% csrf_token %}
+    <label>Full name <input name="name" required value="{{ user_obj.first_name }}"></label>
+    <label>Email <input type="email" name="email" required value="{{ user_obj.email }}"></label>
+    <label>Phone <input name="phone"></label>
+    <label>Delivery address <textarea name="address" rows="3" required></textarea></label>
+    <button class="btn" type="submit">Place order</button>
+  </form>
+  <aside class="card">
+    <h3>Order summary</h3>
+    {% for i in items %}<p>{{ i.quantity }} &times; {{ i.product.name }} <span class="right">{{ i.line_total }}</span></p>{% endfor %}
+    <p class="total">Total: {{ currency }} {{ total }}</p>
+    <p class="muted">Payment integration (M-Pesa, Stripe) goes here.</p>
+  </aside>
+</div>
+>>>>>>> e3ba4c2ef93cb02a22c05fe11cdcdada809f318b
+{% endblock %}

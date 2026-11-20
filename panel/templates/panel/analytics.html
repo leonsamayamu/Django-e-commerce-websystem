@@ -1,0 +1,59 @@
+{% extends "panel/base.html" %}
+{% load static panel_ui %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div><h1>Analytics</h1><p class="text-sm text-slate-500">Last {{ days }} days compared with the {{ days }} days before.</p></div>
+  <div class="flex flex-wrap items-center gap-2">
+    <nav class="flex gap-2" aria-label="Date range">{% for r in ranges %}<a class="chip {% if r == days %}chip-active{% endif %}" href="?days={{ r }}">{{ r }} days</a>{% endfor %}</nav>
+    <a class="btn btn-outline btn-sm" href="{% url 'staff_analytics_export' %}?days={{ days }}">{% icon "arrow-down-tray" "h-4 w-4" %}Export orders CSV</a>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+  {% for k in kpis %}
+  <div class="card">
+    <div class="flex items-center justify-between text-slate-500"><p class="text-sm">{{ k.label }}</p><span class="text-teal-700">{% icon k.icon "h-5 w-5" %}</span></div>
+    <p class="mt-2 text-xl font-extrabold">{{ k.value }}</p>
+    {% if k.delta is None %}<p class="mt-1 text-xs text-slate-400">No previous data</p>
+    {% elif k.delta >= 0 %}<p class="mt-1 flex items-center gap-1 text-xs font-medium text-emerald-700">{% icon "arrow-trending-up" "h-4 w-4" %}+{{ k.delta }}%</p>
+    {% else %}<p class="mt-1 flex items-center gap-1 text-xs font-medium text-red-700">{% icon "arrow-trending-down" "h-4 w-4" %}{{ k.delta }}%</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<div class="mt-6 grid gap-6 xl:grid-cols-3">
+  <section class="card xl:col-span-2"><h2 class="mb-3 text-base">Revenue and orders</h2><div class="h-72"><canvas data-chart="revenue" role="img" aria-label="Revenue and orders per day"></canvas></div></section>
+  <section class="card"><h2 class="mb-3 text-base">Orders by status</h2><div class="h-72"><canvas data-chart="status" role="img" aria-label="Orders by status"></canvas></div></section>
+  <section class="card"><h2 class="mb-3 text-base">Top products by revenue</h2><div class="h-64"><canvas data-chart="products" role="img" aria-label="Top products by revenue"></canvas></div></section>
+  <section class="card"><h2 class="mb-3 text-base">Revenue by category</h2><div class="h-64"><canvas data-chart="categories" role="img" aria-label="Revenue by category"></canvas></div></section>
+  <section class="card"><h2 class="mb-3 text-base">Customers and subscribers</h2><div class="h-64"><canvas data-chart="people" role="img" aria-label="New customers and subscribers per day"></canvas></div></section>
+</div>
+
+<div class="mt-6 grid gap-6 xl:grid-cols-3">
+  <section class="card">
+    <h2 class="mb-3 text-base">Most viewed products</h2>
+    <table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-slate-500"><th class="pb-2">Product</th><th class="pb-2 text-right">Views</th><th class="pb-2 text-right">Sold</th><th class="pb-2 text-right">Conv.</th></tr></thead><tbody>
+    {% for r in most_viewed %}<tr class="border-t border-slate-100"><td class="py-1.5">{{ r.product__name }}</td><td class="text-right">{{ r.views }}</td><td class="text-right">{{ r.units }}</td><td class="text-right">{{ r.conversion }}%</td></tr>{% empty %}<tr><td colspan="4" class="py-4 text-center text-slate-500">No views recorded yet.</td></tr>{% endfor %}
+    </tbody></table>
+    <p class="mt-2 text-xs text-slate-500">Views are counted once per visitor session per day; staff and bots are ignored. Conversion = units sold / views.</p>
+  </section>
+  <section class="card">
+    <h2 class="mb-3 text-base">Top customers</h2>
+    <table class="w-full text-sm"><tbody>
+    {% for r in top_customers %}<tr class="border-t border-slate-100 first:border-0"><td class="py-1.5"><span class="font-medium">@{{ r.order__user__username }}</span><br><span class="text-xs text-slate-500">{{ r.orders }} order{{ r.orders|pluralize }}</span></td><td class="text-right font-semibold">{{ currency }} {{ r.revenue|floatformat:0 }}</td></tr>{% empty %}<tr><td class="py-4 text-center text-slate-500">No orders in this period.</td></tr>{% endfor %}
+    </tbody></table>
+  </section>
+  <section class="card">
+    <h2 class="mb-3 text-base">Newsletter</h2>
+    <p class="text-sm text-slate-600"><span class="text-2xl font-extrabold text-teal-700">{{ subs.active }}</span> active subscribers</p>
+    <p class="mt-1 text-sm text-slate-600">{{ subs.inactive }} unsubscribed overall, {{ unsubscribed_in_range }} in this period.</p>
+    <a class="btn btn-outline btn-sm mt-4" href="{% url 'staff_subscribers' %}">View subscribers</a>
+  </section>
+</div>
+{{ chart_data|json_script:"analytics-data" }}
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'panel/vendor/chart.umd.min.js' %}"></script>
+<script src="{% static 'panel/analytics.js' %}" defer></script>
+{% endblock %}

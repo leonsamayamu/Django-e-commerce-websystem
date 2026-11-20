@@ -1,0 +1,20 @@
+{% extends "store/base.html" %}
+{% block title %}Staff dashboard{% endblock %}
+{% block content %}
+<h1>Staff dashboard</h1>
+<div class="stats">
+  <div class="card stat"><span class="muted">Orders</span><strong>{{ order_count }}</strong></div>
+  <div class="card stat"><span class="muted">Pending</span><strong>{{ pending_count }}</strong></div>
+  <div class="card stat"><span class="muted">Products</span><strong>{{ product_count }}</strong></div>
+  <div class="card stat"><span class="muted">Revenue ({{ currency }})</span><strong>{{ revenue }}</strong></div>
+</div>
+<div class="row-actions">
+  <a class="btn" href="{% url 'staff_orders' %}">Manage orders</a>
+  <a class="btn" href="{% url 'staff_products' %}">Manage products</a>
+  <a class="btn" href="/admin/">Admin site</a>
+</div>
+<h2>Low stock (5 or fewer)</h2>
+{% for p in low_stock %}<p><a href="{% url 'staff_product_edit' p.pk %}">{{ p.name }}</a> &mdash; {{ p.stock }} left</p>{% empty %}<p class="muted">Nothing low on stock.</p>{% endfor %}
+<h2>Recent orders</h2>
+{% for o in recent %}<p><a href="{% url 'staff_order_detail' o.pk %}">#{{ o.pk }}</a> {{ o.name }} <span class="badge {{ o.status }}">{{ o.get_status_display }}</span> <span class="right">{{ currency }} {{ o.total }}</span></p>{% empty %}<p class="muted">No orders yet.</p>{% endfor %}
+{% endblock %}

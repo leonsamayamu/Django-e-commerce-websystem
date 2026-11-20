@@ -1,0 +1,14 @@
+{% extends "panel/base.html" %}
+{% block title %}Customer messages{% endblock %}
+{% block content %}
+<h1 class="mb-4">Customer messages</h1>
+<nav class="mb-4 flex gap-2" aria-label="Filter"><a class="chip {% if not only_unread %}chip-active{% endif %}" href="{% url 'staff_messages' %}">All</a><a class="chip {% if only_unread %}chip-active{% endif %}" href="?unread=1">Unread</a></nav>
+<div class="space-y-3">
+{% for t in threads %}
+<a class="card flex items-center justify-between gap-3 text-slate-900 transition hover:border-teal-600" href="{% url 'staff_thread' t.pk %}">
+  <span><span class="font-semibold">{{ t.subject }}</span> <span class="text-sm text-slate-500">{{ t.customer.get_full_name|default:t.customer.username }}</span>{% if t.unread %}<span class="count">{{ t.unread }} new</span>{% endif %}</span>
+  <span class="text-xs text-slate-500">{{ t.updated|date:"j M H:i" }}</span>
+</a>
+{% empty %}<p class="text-slate-500">No messages.</p>{% endfor %}
+</div>
+{% endblock %}

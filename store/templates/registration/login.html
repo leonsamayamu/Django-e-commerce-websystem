@@ -1,0 +1,14 @@
+{% extends "store/base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="auth-box card">
+  <h1>Log in</h1>
+  <form method="post" class="form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn" type="submit">Log in</button>
+  </form>
+  <p class="muted">Staff and customers log in here. New customer? <a href="{% url 'register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Create an account</a></p>
+</div>
+{% endblock %}

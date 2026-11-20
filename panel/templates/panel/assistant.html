@@ -1,0 +1,33 @@
+{% extends "panel/base.html" %}
+{% load panel_ui %}
+{% block title %}AI assistant{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div><h1>AI assistant</h1><p class="text-sm text-slate-500">The chat helper shown to customers and guests on every shop page.</p></div>
+  <a class="btn btn-outline" data-modal href="{% url 'staff_assistant_edit' %}">{% icon "cog-6-tooth" "h-4 w-4" %}Settings</a>
+</div>
+<div class="grid gap-6 lg:grid-cols-3">
+  <section class="card text-sm"><h2 class="text-base">Status</h2>
+    <p class="mt-3 flex justify-between"><span>Chat widget</span>{% if cfg.enabled %}<span class="badge badge-ok">On</span>{% else %}<span class="badge">Off</span>{% endif %}</p>
+    <p class="mt-2 flex justify-between"><span>AI answers</span>{% if cfg.use_ai and key_set %}<span class="badge badge-ok">On ({{ model }})</span>{% elif not key_set %}<span class="badge badge-pending">No API key</span>{% else %}<span class="badge">Off</span>{% endif %}</p>
+    <p class="mt-2 flex justify-between"><span>Daily limit / visitor</span><span>{{ cfg.max_messages_per_day }}</span></p>
+    {% if not key_set %}<p class="mt-3 text-xs text-slate-500">Without <code>ANTHROPIC_API_KEY</code> the assistant still answers your commands (slash commands and keyword matches), but does not write free-text AI replies.</p>{% endif %}
+  </section>
+  <section class="card text-sm lg:col-span-2"><h2 class="text-base">Strict safety design</h2>
+    <ul class="mt-3 list-disc space-y-1 pl-5 text-slate-700">
+      <li><strong>No database access.</strong> The AI code cannot import models or query data, and has no tools. It sees only the commands you write below and the visitor's question.</li>
+      <li>It never receives orders, customers, stock, prices or staff data. Anything not written in a command, it does not know.</li>
+      <li>Built-in rules (placed last, so they win) forbid revealing instructions, asking for passwords or PINs, or taking actions.</li>
+      <li>Rate limits per visitor, 500-character questions, short replies, and plain-text output only.</li>
+    </ul></section>
+</div>
+<section class="card mt-6">
+  <div class="mb-3 flex items-center justify-between"><h2 class="text-base">Commands (the assistant's knowledge)</h2><a class="btn btn-sm" data-modal href="{% url 'staff_command_new' %}">{% icon "plus" "h-4 w-4" %}Add command</a></div>
+  <p class="mb-3 text-xs text-slate-500">Visitors can type <code>/trigger</code> (or tap its button) for the exact reply. When "Share with AI" is on, the AI may also use the text to answer free-form questions in its own words.</p>
+  <div class="overflow-x-auto"><table class="tbl"><thead><tr><th>Command</th><th>Title</th><th>Reply</th><th>For</th><th>AI</th><th>Status</th><th></th></tr></thead><tbody>
+  {% for c in commands %}<tr><td class="font-mono text-xs">/{{ c.trigger }}</td><td class="font-medium">{{ c.title }}</td><td class="max-w-sm text-xs text-slate-600">{{ c.response|truncatechars:110 }}</td><td class="text-xs">{{ c.get_audience_display }}</td><td>{% if c.use_in_ai %}<span class="badge badge-ok">Yes</span>{% else %}<span class="badge">No</span>{% endif %}</td><td>{% if c.active %}<span class="badge badge-ok">Active</span>{% else %}<span class="badge">Off</span>{% endif %}</td>
+    <td class="whitespace-nowrap text-right"><a class="btn btn-outline btn-sm" data-modal href="{% url 'staff_command_edit' c.pk %}">Edit</a> <a class="btn btn-danger btn-sm" data-modal href="{% url 'staff_command_delete' c.pk %}">Delete</a></td></tr>
+  {% empty %}<tr><td colspan="7" class="py-8 text-center text-slate-500">No commands yet. Add shipping, returns and payment info so the assistant can help.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

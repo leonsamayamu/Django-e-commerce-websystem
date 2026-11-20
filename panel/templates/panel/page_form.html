@@ -1,0 +1,11 @@
+{% extends "panel/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="card mx-auto max-w-3xl">
+  {% csrf_token %}
+  <h1 class="text-xl">{{ title }}</h1>
+  {% if subtitle %}<p class="mb-4 text-sm text-slate-500">{{ subtitle }}</p>{% endif %}
+  <div class="mt-4">{% include "panel/_form_body.html" %}</div>
+  <div class="mt-4 flex gap-3"><button type="submit" class="btn {% if danger %}btn-danger{% endif %}">{{ submit }}</button><a class="btn btn-outline" href="{{ cancel_url }}">Cancel</a></div>
+</form>
+{% endblock %}

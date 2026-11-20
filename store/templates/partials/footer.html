@@ -1,0 +1,55 @@
+<footer class="mt-8 bg-slate-900 text-slate-300">
+  <div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
+    <div>
+      <p class="flex items-center gap-2 text-lg font-extrabold text-white"><span aria-hidden="true">🛍️</span>{{ shop_name }}</p>
+      <p class="mt-3 text-sm text-slate-400">Quality products, clear photos and a team that answers when you write.</p>
+      <p class="mt-3 text-sm"><a class="footer-link" href="mailto:{{ shop_email }}">{{ shop_email }}</a></p>
+    </div>
+    <div>
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Shop</h3>
+      <ul class="mt-3 space-y-2">
+        <li><a class="footer-link" href="{% url 'product_list' %}">All products</a></li>
+        {% for c in nav_categories|slice:":5" %}<li><a class="footer-link" href="{% url 'product_list' %}?category={{ c.pk }}">{{ c.name }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Help</h3>
+      <ul class="mt-3 space-y-2">
+        <li><a class="footer-link" href="{% url 'about' %}">About us</a></li>
+        <li><a class="footer-link" href="{% url 'contact' %}">Contact us</a></li>
+        {% if user.is_authenticated %}
+          <li><a class="footer-link" href="{% url 'my_orders' %}">My orders</a></li>
+          <li><a class="footer-link" href="{% url 'profile' %}">My profile</a></li>
+        {% else %}
+          <li><a class="footer-link" href="{% url 'login' %}">Log in</a></li>
+          <li><a class="footer-link" href="{% url 'register' %}">Create account</a></li>
+        {% endif %}
+      </ul>
+    </div>
+    {% if newsletter_subscribed %}
+    <div>
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Newsletter</h3>
+      <p class="mt-3 flex items-center gap-2 text-sm text-emerald-300"><span aria-hidden="true">&#10003;</span> You are subscribed with {{ user.email }}.</p>
+      <p class="mt-2 text-sm"><a class="footer-link" href="{% url 'profile' %}">Manage in your profile</a></p>
+    </div>
+    {% else %}
+    <form method="post" action="{% url 'subscribe' %}">
+      {% csrf_token %}
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-white"><label for="sub-email">Newsletter</label></h3>
+      <p class="mt-3 text-sm text-slate-400">Offers and news. Unsubscribe any time.</p>
+      <div class="mt-3 flex">
+        <input id="sub-email" type="email" name="email" placeholder="you@example.com" required autocomplete="email" class="!rounded-r-none !border-slate-700 !bg-slate-800 !text-white placeholder:text-slate-500">
+        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn !rounded-l-none" type="submit">Join</button>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+  <div class="border-t border-slate-800">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-slate-500 sm:flex-row">
+      <p>&copy; {% now "Y" %} {{ shop_name }}. All rights reserved.</p>
+      <p>Secure checkout &middot; Fast support</p>
+    </div>
+  </div>
+</footer>

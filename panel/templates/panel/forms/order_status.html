@@ -1,0 +1,10 @@
+<div class="grid gap-x-4 sm:grid-cols-2">
+  <div class="sm:col-span-2">{% include "partials/field.html" with field=form.status %}</div>
+  {% if form.courier %}<div class="sm:col-span-2">{% include "partials/field.html" with field=form.courier %}</div>{% endif %}
+  {% if form.paid %}<div class="sm:col-span-2">{% include "partials/field.html" with field=form.paid %}</div>{% endif %}
+</div>
+<ul class="list-disc space-y-1 pl-5 text-xs text-slate-500">
+  <li>Cancelling returns the items to stock. The customer is emailed on every status change.</li>
+  <li>Delivering a pay-on-delivery order marks it paid (cash collected).</li>
+  <li>Online-payment orders cannot be dispatched until they are paid.</li>
+</ul>

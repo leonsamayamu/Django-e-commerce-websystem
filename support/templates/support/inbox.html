@@ -1,0 +1,15 @@
+{% extends "store/base.html" %}
+{% block title %}Messages - {{ shop_name }}{% endblock %}
+{% block layout_class %}with-sidebar{% endblock %}
+{% block sidebar %}{% include "partials/sidebar_account.html" %}{% endblock %}
+{% block content %}
+<div class="mb-6 flex items-center justify-between"><h1>Messages</h1><a class="btn" href="{% url 'new_thread' %}">New message</a></div>
+<div class="space-y-3">
+{% for t in threads %}
+<a class="card flex items-center justify-between gap-3 text-slate-900 transition hover:border-teal-600" href="{% url 'thread' t.pk %}">
+  <span class="font-semibold">{{ t.subject }}{% if t.unread %}<span class="count">{{ t.unread }} new</span>{% endif %}</span>
+  <span class="text-xs text-slate-500">{{ t.updated|date:"j M H:i" }}</span>
+</a>
+{% empty %}<p class="rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-500">No messages yet. Questions about an order or product? <a href="{% url 'new_thread' %}">Message the shop</a>.</p>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "panel/base.html" %}
+{% load panel_ui %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div><h1>Dashboard</h1><p class="text-sm text-slate-500">Signed in as {{ staff_role_label|default:"staff" }}.</p></div>
+  <div class="flex flex-wrap gap-2">
+    {% if "catalog" in caps %}<a class="btn" data-modal href="{% url 'staff_product_new' %}">{% icon "plus" "h-4 w-4" %}Add product</a>{% endif %}
+    {% if "customers" in caps %}<a class="btn btn-outline" data-modal href="{% url 'staff_user_new' %}">{% icon "user-plus" "h-4 w-4" %}Add user</a>{% endif %}
+    {% if "analytics" in caps %}<a class="btn btn-outline" href="{% url 'staff_analytics' %}">{% icon "chart-bar" "h-4 w-4" %}Analytics</a>{% endif %}
+  </div>
+</div>
+
+<div class="grid grid-cols-2 gap-4 xl:grid-cols-5">
+  {% if revenue is not None and "analytics" in caps %}<div class="card"><p class="text-sm text-slate-500">Revenue ({{ currency }})</p><p class="mt-1 text-2xl font-extrabold text-teal-700">{{ revenue }}</p><p class="mt-1 text-xs text-slate-500">{{ week_revenue }} in last 7 days</p></div>{% endif %}
+  {% if "orders" in caps %}
+  <div class="card"><p class="text-sm text-slate-500">{% if role == "delivery" %}My orders{% else %}Orders{% endif %}</p><p class="mt-1 text-2xl font-extrabold">{{ order_count }}</p><p class="mt-1 text-xs text-amber-700">{{ pending_count }} pending</p></div>
+  {% if role != "delivery" %}<div class="card"><p class="text-sm text-slate-500">To pack</p><p class="mt-1 text-2xl font-extrabold">{{ to_pack }}</p><p class="mt-1 text-xs text-slate-500">pending or processing</p></div>{% endif %}
+  <div class="card"><p class="text-sm text-slate-500">On the way</p><p class="mt-1 text-2xl font-extrabold">{{ to_deliver }}</p><p class="mt-1 text-xs text-slate-500">shipped or out for delivery</p></div>
+  {% endif %}
+  {% if "catalog" in caps %}<div class="card"><p class="text-sm text-slate-500">Products</p><p class="mt-1 text-2xl font-extrabold">{{ product_count }}</p></div>{% endif %}
+  {% if "analytics" in caps %}<div class="card"><p class="text-sm text-slate-500">Customers</p><p class="mt-1 text-2xl font-extrabold">{{ customer_count }}</p></div>{% endif %}
+  {% if "marketing" in caps %}<a href="{% url 'staff_subscribers' %}" class="card block transition hover:border-teal-600"><p class="text-sm text-slate-500">Active subscribers</p><p class="mt-1 text-2xl font-extrabold text-teal-700">{{ active_subs }}</p><p class="mt-1 text-xs text-emerald-700">{{ new_subs_week }} new this week</p></a>{% endif %}
+</div>
+
+{% if my_deliveries is not None and role == "delivery" %}
+<section class="card mt-6">
+  <h2 class="mb-3 text-base">Your deliveries</h2>
+  <div class="overflow-x-auto"><table class="tbl"><thead><tr><th>#</th><th>Customer</th><th>Address</th><th>Collect</th><th>Status</th><th></th></tr></thead><tbody>
+  {% for o in my_deliveries %}<tr><td><a class="font-semibold" href="{% url 'staff_order_detail' o.pk %}">#{{ o.pk }}</a></td><td>{{ o.name }}<br><a class="text-xs" href="tel:{{ o.phone }}">{{ o.phone }}</a></td><td class="max-w-xs text-xs">{{ o.address|truncatechars:80 }}</td>
+    <td>{% if o.paid %}<span class="badge badge-ok">Paid</span>{% else %}<span class="font-semibold">{{ currency }} {{ o.t|default:0 }}</span>{% endif %}</td>
+    <td><span class="badge badge-{{ o.status }}">{{ o.get_status_display }}</span></td><td class="text-right"><a class="btn btn-sm" data-modal href="{% url 'staff_order_status' o.pk %}">Update</a></td></tr>
+  {% empty %}<tr><td colspan="6" class="py-8 text-center text-slate-500">No deliveries assigned to you right now.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}
+
+<div class="mt-6 grid gap-6 xl:grid-cols-3">
+  {% if days and "analytics" in caps %}
+  <section class="card xl:col-span-2">
+    <h2 class="mb-4 text-base">Sales, last 7 days ({{ currency }})</h2>
+    <div class="flex h-48 items-end gap-3">
+      {% for d in days %}
+      <div class="flex h-full flex-1 flex-col items-center justify-end gap-1" title="{{ d.day|date:'j M' }}: {{ d.total }}">
+        <span class="text-[11px] text-slate-500">{% if d.total %}{{ d.total }}{% endif %}</span>
+        <div class="w-full rounded-t-md {% if d.total %}bg-teal-600{% else %}bg-slate-200{% endif %}" style="height: {{ d.pct }}%"></div>
+        <span class="text-xs text-slate-500">{{ d.day|date:"D" }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% if "marketing" in caps or "catalog" in caps %}
+  <section class="card">
+    {% if "marketing" in caps %}
+    <div class="mb-3 flex items-center justify-between"><h2 class="text-base">Newest subscribers</h2><a class="text-sm" href="{% url 'staff_subscribers' %}">View all</a></div>
+    {% for sub in latest_subs %}<p class="flex items-center justify-between border-b border-slate-100 py-1.5 text-sm"><span class="truncate">{{ sub.email }}</span><span class="ml-2 flex-none text-xs text-slate-500">{{ sub.created|timesince }} ago</span></p>{% empty %}<p class="text-sm text-slate-500">No subscribers yet.</p>{% endfor %}
+    {% endif %}
+    {% if "catalog" in caps %}
+    <h2 class="mb-3 mt-6 text-base first:mt-0">Low stock</h2>
+    {% for p in low_stock %}<p class="flex items-center justify-between border-b border-slate-100 py-1.5 text-sm"><a data-modal href="{% url 'staff_product_edit' p.pk %}">{{ p.name }}</a><span class="font-semibold {% if p.stock == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ p.stock }} left</span></p>{% empty %}<p class="text-sm text-slate-500">Nothing low on stock.</p>{% endfor %}
+    {% endif %}
+  </section>
+  {% endif %}
+</div>
+
+{% if recent is not None and role != "delivery" and "orders" in caps %}
+<section class="card mt-6">
+  <div class="mb-3 flex items-center justify-between"><h2 class="text-base">Recent orders</h2><a class="text-sm" href="{% url 'staff_orders' %}">View all</a></div>
+  <div class="overflow-x-auto"><table class="tbl"><tbody>
+  {% for o in recent %}<tr><td><a class="font-semibold" href="{% url 'staff_order_detail' o.pk %}">#{{ o.pk }}</a></td><td>{{ o.name }}</td><td><span class="badge badge-{{ o.status }}">{{ o.get_status_display }}</span></td><td class="text-right font-semibold">{{ currency }} {{ o.t|default:0 }}</td></tr>
+  {% empty %}<tr><td class="text-slate-500">No orders yet.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}
+{% endblock %}

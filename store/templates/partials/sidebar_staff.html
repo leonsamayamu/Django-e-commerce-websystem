@@ -1,0 +1,23 @@
+<button class="sidebar-toggle btn btn-outline btn-sm mb-4 lg:hidden" type="button" aria-expanded="false" aria-controls="sidebar">Staff menu</button>
+<aside id="sidebar" class="card mb-6 hidden lg:sticky lg:top-32 lg:mb-0 lg:block" aria-label="Staff navigation">
+  {% with n=request.resolver_match.url_name %}
+  <p class="side-title">Staff</p>
+  <ul class="space-y-0.5">
+    <li><a class="side-link {% if n == 'staff_dashboard' %}side-link-active{% endif %}" href="{% url 'staff_dashboard' %}">Dashboard</a></li>
+    <li><a class="side-link {% if n == 'staff_orders' or n == 'staff_order_detail' %}side-link-active{% endif %}" href="{% url 'staff_orders' %}">Orders</a></li>
+    <li><a class="side-link {% if 'product' in n %}side-link-active{% endif %}" href="{% url 'staff_products' %}">Products</a></li>
+  </ul>
+  <p class="side-title">Customers</p>
+  <ul class="space-y-0.5">
+    <li><a class="side-link {% if n == 'staff_messages' or n == 'staff_thread' %}side-link-active{% endif %}" href="{% url 'staff_messages' %}"><span>Messages</span>{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a></li>
+    <li><a class="side-link {% if n == 'staff_contacts' %}side-link-active{% endif %}" href="{% url 'staff_contacts' %}"><span>Contact inquiries</span>{% if new_contacts %}<span class="count">{{ new_contacts }}</span>{% endif %}</a></li>
+    <li><a class="side-link {% if n == 'staff_subscribers' %}side-link-active{% endif %}" href="{% url 'staff_subscribers' %}">Subscribers</a></li>
+    <li><a class="side-link {% if n == 'staff_newsletter' %}side-link-active{% endif %}" href="{% url 'staff_newsletter' %}">Send newsletter</a></li>
+  </ul>
+  <p class="side-title">Other</p>
+  <ul class="space-y-0.5">
+    <li><a class="side-link" href="/admin/">Admin site</a></li>
+    <li><a class="side-link" href="{% url 'product_list' %}">View shop</a></li>
+  </ul>
+  {% endwith %}
+</aside>

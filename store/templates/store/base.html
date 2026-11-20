@@ -1,0 +1,67 @@
+<<<<<<< HEAD
+{% load static %}<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ shop_name }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ shop_name }}: quality products, delivered.{% endblock %}">
+  <meta property="og:site_name" content="{{ shop_name }}">
+  <meta property="og:title" content="{% block og_title %}{{ shop_name }}{% endblock %}">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+  <link rel="stylesheet" href="{% static 'store/tailwind.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="flex min-h-full flex-col">
+  <a href="#main" class="sr-only z-50 rounded-lg bg-white px-4 py-2 text-teal-800 shadow focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
+  {% include "partials/header.html" %}
+  <div class="mx-auto w-full max-w-7xl flex-1 px-4 py-6 {% block layout_class %}{% endblock %}">
+    {% block sidebar %}{% endblock %}
+    <main id="main" class="min-w-0">
+      {% for m in messages %}<div class="alert alert-{{ m.tags }}" role="status">{{ m }}</div>{% endfor %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <div id="toast" class="fixed bottom-4 left-4 z-50 rounded-lg bg-slate-900 px-4 py-3 text-sm text-white shadow-lg" role="status" hidden></div>
+  {% include "partials/footer.html" %}
+  {% if assistant_enabled %}{% include "assistant/widget.html" %}{% endif %}
+=======
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Django Shop{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="{% url 'product_list' %}">Django Shop</a>
+    <form class="search" method="get" action="{% url 'product_list' %}">
+      <input type="search" name="q" value="{{ q|default:'' }}" placeholder="Search products" aria-label="Search">
+      <button class="btn" type="submit">Search</button>
+    </form>
+    <nav class="user-nav">
+      {% if user.is_authenticated %}
+        <span class="muted">Hi, {{ user.first_name|default:user.username }}</span>
+        {% if user.is_staff %}<a href="{% url 'staff_dashboard' %}">Staff</a><a href="/admin/">Admin</a>{% endif %}
+        <a href="{% url 'my_orders' %}">My orders</a>
+        <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}<button class="linklike" type="submit">Log out</button></form>
+      {% else %}
+        <a href="{% url 'login' %}">Log in</a><a href="{% url 'register' %}">Register</a>
+      {% endif %}
+      <a class="cart-link" href="{% url 'cart' %}">Cart (<span id="cart-count">{{ cart_count }}</span>)</a>
+    </nav>
+  </header>
+  <main class="container">
+    {% for m in messages %}<div class="alert {{ m.tags }}">{{ m }}</div>{% endfor %}
+    <div id="toast" class="toast" hidden></div>
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">&copy; Django Shop</footer>
+>>>>>>> e3ba4c2ef93cb02a22c05fe11cdcdada809f318b
+  <script src="{% static 'store/app.js' %}" defer></script>
+</body>
+</html>

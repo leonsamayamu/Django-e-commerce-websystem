@@ -1,0 +1,2 @@
+{% if preview %}<img class="mb-4 max-h-48 rounded-lg" src="{{ preview.image.url }}" alt="">{% endif %}
+{% for field in form %}{% include "partials/field.html" %}{% endfor %}

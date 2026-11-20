@@ -1,0 +1,8 @@
+{% extends "panel/base.html" %}
+{% block title %}{{ thread.subject }}{% endblock %}
+{% block content %}
+<p class="mb-3 text-sm"><a href="{% url 'staff_messages' %}">&larr; All customer messages</a></p>
+<h1>{{ thread.subject }}</h1>
+<p class="mt-1 text-sm text-slate-500">From {{ thread.customer.get_full_name|default:thread.customer.username }} ({{ thread.customer.email }})</p>
+{% include "support/_chat.html" %}
+{% endblock %}

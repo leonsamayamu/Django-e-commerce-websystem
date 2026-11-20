@@ -1,0 +1,9 @@
+{% extends "panel/base.html" %}
+{% block title %}Send newsletter{% endblock %}
+{% block content %}
+<h1 class="mb-1">Send newsletter</h1>
+<p class="mb-4 text-sm text-slate-500">Will be sent to {{ active_count }} active subscriber{{ active_count|pluralize }}.</p>
+<form method="post" class="card max-w-3xl">{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">Send now</button></form>
+<h2 class="mb-3 mt-8 text-lg">Recently sent</h2>
+{% for n in history %}<p class="border-b border-slate-100 py-2 text-sm">{{ n.sent_at|date:"j M Y H:i" }} &mdash; <strong>{{ n.subject }}</strong> <span class="text-slate-500">({{ n.recipients }} recipients)</span></p>{% empty %}<p class="text-sm text-slate-500">Nothing sent yet.</p>{% endfor %}
+{% endblock %}

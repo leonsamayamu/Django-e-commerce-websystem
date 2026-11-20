@@ -1,0 +1,37 @@
+{% extends "panel/base.html" %}
+{% load panel_ui %}
+{% block title %}Subscribers{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <h1>Subscribers</h1>
+  <div class="flex gap-2"><a class="btn btn-outline" href="?format=csv">{% icon "arrow-down-tray" "h-4 w-4" %}Download CSV</a><a class="btn" href="{% url 'staff_newsletter' %}">{% icon "megaphone" "h-4 w-4" %}Send newsletter</a></div>
+</div>
+<div class="mb-4 grid grid-cols-3 gap-4">
+  <div class="card"><p class="text-sm text-slate-500">Active</p><p class="mt-1 text-2xl font-extrabold text-teal-700">{{ counts.active }}</p></div>
+  <div class="card"><p class="text-sm text-slate-500">Unsubscribed</p><p class="mt-1 text-2xl font-extrabold text-slate-600">{{ counts.inactive }}</p></div>
+  <div class="card"><p class="text-sm text-slate-500">All time</p><p class="mt-1 text-2xl font-extrabold">{{ counts.all }}</p></div>
+</div>
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <nav class="flex gap-2" aria-label="Filter by status">
+    <a class="chip {% if status == 'active' %}chip-active{% endif %}" href="?status=active">Active ({{ counts.active }})</a>
+    <a class="chip {% if status == 'inactive' %}chip-active{% endif %}" href="?status=inactive">Unsubscribed ({{ counts.inactive }})</a>
+    <a class="chip {% if status == 'all' %}chip-active{% endif %}" href="?status=all">All</a>
+  </nav>
+  <form method="get" class="flex gap-2" role="search"><input type="hidden" name="status" value="{{ status }}"><input type="search" name="q" value="{{ q }}" placeholder="Search email" class="!w-56"><button class="btn btn-outline" type="submit">Search</button></form>
+</div>
+<div class="overflow-x-auto"><table class="tbl">
+  <thead><tr><th>Email</th><th>Status</th><th>Customer account</th><th>Subscribed</th><th></th></tr></thead>
+  <tbody>
+  {% for s in rows %}
+  <tr>
+    <td class="font-medium">{{ s.email }}</td>
+    <td>{% if s.active %}<span class="badge badge-ok">Active</span>{% else %}<span class="badge">Unsubscribed</span>{% endif %}</td>
+    <td>{% if s.account %}<span class="font-medium">@{{ s.account.username }}</span> {% if s.account.is_active %}<span class="badge badge-ok">Active account</span>{% else %}<span class="badge badge-cancelled">Inactive account</span>{% endif %}{% else %}<span class="text-xs text-slate-400">Guest</span>{% endif %}</td>
+    <td>{{ s.created|date:"j M Y" }}</td>
+    <td class="text-right"><a class="btn btn-danger btn-sm" data-modal href="{% url 'staff_subscriber_delete' s.pk %}">Delete</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="5" class="py-8 text-center text-slate-500">No subscribers here yet.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% include "panel/_pagination.html" %}
+{% endblock %}
